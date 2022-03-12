@@ -4,6 +4,7 @@ import Polygon from './classes/Polygon';
 import RegularPolygon from './classes/RegularPolygon';
 import Draggable from './classes/Draggable';
 import PointSet from './classes/PointSet';
+import ArtBoardLayer from './classes/ArtBoardLayer';
 window.onload = function() {
   console.log('loaded');
   const app = new PIXI.Application({
@@ -38,13 +39,16 @@ window.onload = function() {
   app.stage.addChild(d2);
   //*/
 
-  const ps = new PointSet();
-  ps.x = 100;
-  ps.y = 100;
-  app.stage.addChild(ps);
-  ps.onChange(data => {
-    console.log(data);
-  });
+  // const ps = new PointSet();
+  // ps.x = 100;
+  // ps.y = 100;
+  // app.stage.addChild(ps);
+  // ps.onChange(data => {
+  //   console.log(data);
+  // });
+
+  const artBoardLayer = new ArtBoardLayer({width: 800, height: 600});
+  app.stage.addChild(artBoardLayer);
 
 
 

@@ -1,9 +1,8 @@
-import * as PIXI from 'pixi.js';
-export default class Draggable extends PIXI.Container{
+import InteractiveContainer from './InteractiveContainer';
+export default class Draggable extends InteractiveContainer{
     constructor(dragTarget, supressMobile){
         super();
         this.dragging = false;
-        this.interactive = true;
         this.offset = { x: 0, y: 0 };
         this.dragTarget = dragTarget ? dragTarget : this;
         this.startHandler = null;
@@ -23,9 +22,6 @@ export default class Draggable extends PIXI.Container{
             this.on('touchend', this.endDrag);
             this.on('touchendoutside', this.endDrag);
         }
-    }
-    processEvent (e) {
-        return {x: e.data.global.x, y: e.data.global.y};
     }
     startDrag(e){
         this.dragging = true;
