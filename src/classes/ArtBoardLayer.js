@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import InteractiveContainer from './InteractiveContainer';
 import PointSetGroup from './PointSetGroup';
 import VectorableGraphics from './VectorableGraphics';
+import Draggable from './Draggable';
 const ArtBoardModes = {
     MOVE: 0,
     PEN: 1,
@@ -18,7 +19,16 @@ export default class ArtBoardLayer extends InteractiveContainer{
         this.mode = mode ? mode : ArtBoardModes.PEN;
         this.layerType = LayerTypes.UNSET;
         this.editor = null;
-        this.shapeContainer = new PIXI.Container();
+        this.shapeContainer = new Draggable();
+        this.shapeContainer.onStart(() => {
+            this.editor.visible = false;
+        });
+        this.shapeContainer.onEnd(() => {
+            this.shiftPoints(this.shapeContainer.x, this.shapeContainer.y);
+            this.shapeContainer.x = 0;
+            this.shapeContainer.y = 0;
+            this.editor.visible = true;
+        });
         this.shape = null;
         this.interactive = false;
         this.surfaceContainer = new InteractiveContainer();
@@ -42,10 +52,10 @@ export default class ArtBoardLayer extends InteractiveContainer{
                         this.editor = new PointSetGroup(event.x, event.y);
                         this.shape = new VectorableGraphics();
                         this.shapeContainer.addChild(this.shape);
-                        this.editor.onChange((points, close) => {
+                        this.editor.onChange((points) => {
                             if(points.length > 1){
                                 this.shape.clear();
-                                this.shape.beginFill(0x00ff00, 0);
+                                this.shape.beginFill(0xffffff, .001);
                                 this.shape.lineStyle(1, 0x000000, 1);
                                 this.shape.moveTo()
                                 points.forEach((item, index) => {
@@ -59,6 +69,7 @@ export default class ArtBoardLayer extends InteractiveContainer{
                                     if(nextCoords){
                                         this.shape.bezierCurveTo(coords.anchors.after.x, coords.anchors.after.y, nextCoords.anchors.before.x, nextCoords.anchors.before.y, nextCoords.x, nextCoords.y)
                                     }
+                                    this.surfaceContainer.interactive = !this.editor.closed;
                                     
                                 });
                                 this.shape.endFill();
@@ -92,5 +103,12 @@ export default class ArtBoardLayer extends InteractiveContainer{
     
     setMode(mode){
         this.mode = mode;
+    }
+    shiftPoints(x, y){
+        this.editor.points.forEach(item => {
+            item.x += x;
+            item.y += y;
+        });
+        this.editor.changeHandler(this.editor.points);
     }
 }
