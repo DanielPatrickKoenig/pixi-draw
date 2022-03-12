@@ -1,10 +1,7 @@
 import * as PIXI from 'pixi.js';
 import InteractiveContainer from './InteractiveContainer';
 import PointSetGroup from './PointSetGroup';
-const CreationTypes = {
-    PEN: 1,
-    POLYGON: 2
-};
+import VectorableGraphics from './VectorableGraphics';
 const ArtBoardModes = {
     MOVE: 0,
     PEN: 1,
@@ -21,11 +18,13 @@ export default class ArtBoardLayer extends InteractiveContainer{
         this.mode = mode ? mode : ArtBoardModes.PEN;
         this.layerType = LayerTypes.UNSET;
         this.editor = null;
+        this.shapeContainer = new PIXI.Container();
         this.shape = null;
         this.interactive = false;
         this.surfaceContainer = new InteractiveContainer();
+        this.addChild(this.shapeContainer);
         const surface = new PIXI.Graphics();
-        surface.beginFill(0xcc0000);
+        surface.beginFill(0xffffff, .001);
         surface.drawRect(0,0,width,height);
         this.addChild(this.surfaceContainer);
         this.surfaceContainer.addChild(surface);
@@ -41,9 +40,34 @@ export default class ArtBoardLayer extends InteractiveContainer{
                     this.layerType = LayerTypes.PEN;
                     if(!this.editor){
                         this.editor = new PointSetGroup(event.x, event.y);
+                        this.shape = new VectorableGraphics();
+                        this.shapeContainer.addChild(this.shape);
+                        this.editor.onChange((points, close) => {
+                            if(points.length > 1){
+                                this.shape.clear();
+                                this.shape.beginFill(0x00ff00, 0);
+                                this.shape.lineStyle(1, 0x000000, 1);
+                                this.shape.moveTo()
+                                points.forEach((item, index) => {
+                                    const coords = item.getAnchorPositions();
+                                    if(index === 0){
+                                        this.shape.moveTo(coords.x, coords.y);
+                                    }
+                                    const shouldCloseShape = index === points.length - 1 && this.editor.closed;
+                                    const nextIndex = shouldCloseShape ? 0 : index + 1;
+                                    const nextCoords = points[nextIndex] ? points[nextIndex].getAnchorPositions() : null;
+                                    if(nextCoords){
+                                        this.shape.bezierCurveTo(coords.anchors.after.x, coords.anchors.after.y, nextCoords.anchors.before.x, nextCoords.anchors.before.y, nextCoords.x, nextCoords.y)
+                                    }
+                                    
+                                });
+                                this.shape.endFill();
+                            }
+                            
+                        });
                         this.addChild(this.editor);
                     }
-                    else{
+                    else if(!this.editor.closed){
                         this.editor.addPoint(event.x, event.y);
                     }
                     break;

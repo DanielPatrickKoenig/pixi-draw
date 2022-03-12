@@ -4,9 +4,12 @@ import jt from 'jstrig';
 export default class PointSet extends PIXI.Container{
     constructor(){
         super();
+        this.setID = `${Math.random().toString().split('.').join('')}-${Math.random().toString().split('.').join('')}-${Math.random().toString().split('.').join('')}`;
+        this.firstMove = true;
         this.mirrorDistance = true;
         this.mirrorAngle = true;
         this.changeHandler = null;
+        this.selectedHandler = null;
         const anchorSize = 10;
         const pointSize = anchorSize * 2;
         this.twinProperties = {
@@ -25,6 +28,11 @@ export default class PointSet extends PIXI.Container{
         
         this.point.addChild(pointGraphic);
         this.addChild(this.point);
+        this.point.onStart(() => {
+            if(this.selectedHandler){
+                this.selectedHandler(this);
+            }
+        });
         this.point.onMove(() => {
             if(this.changeHandler){
                 this.changeHandler(this.getAnchorPositions());
@@ -61,6 +69,15 @@ export default class PointSet extends PIXI.Container{
                 }
             });
             this.anchors[item].onEnd(() => {
+                const eitherMoved = this.anchors.before.hasMoved || this.anchors.after.hasMoved;
+                const beforeMoved = this.firstMove ? eitherMoved : this.anchors.before.hasMoved;
+                const afterMoved = this.firstMove ? eitherMoved : this.anchors.after.hasMoved;
+                this.anchors.before.visible = beforeMoved;
+                this.anchors.after.visible = afterMoved;
+                this.anchors.before.hasMoved = beforeMoved;
+                this.anchors.after.hasMoved = afterMoved;
+                console.log(this.anchors.before.visible);
+                this.firstMove = false;
                 this.mirrorDistance = false;
             });
         });
@@ -84,6 +101,9 @@ export default class PointSet extends PIXI.Container{
     }
     onChange(handler){
         this.changeHandler = handler;
+    }
+    onSelected(handler){
+        this.selectedHandler = handler;
     }
     
 }

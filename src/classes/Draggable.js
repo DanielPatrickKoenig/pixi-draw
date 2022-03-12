@@ -8,6 +8,7 @@ export default class Draggable extends InteractiveContainer{
         this.startHandler = null;
         this.moveHandler = null;
         this.endHandler = null;
+        this.hasMoved = false;
         this.on('mousedown', this.startDrag);
         if(!supressMobile){
             this.on('touchstart', this.startDrag);
@@ -34,8 +35,13 @@ export default class Draggable extends InteractiveContainer{
     doDrag(e){
         if(this.dragging){
             const event = this.processEvent(e);
-            this.dragTarget.x = event.x - this.offset.x;
-            this.dragTarget.y = event.y - this.offset.y;
+            const xPos = event.x - this.offset.x;
+            const yPos = event.y - this.offset.y;
+            if(Math.round(this.dragTarget.x) !== Math.round(xPos) || Math.round(this.dragTarget.y) !== Math.round(yPos)){
+                this.hasMoved = true;
+            }
+            this.dragTarget.x = xPos;
+            this.dragTarget.y = yPos;
             if(this.moveHandler){
                 this.moveHandler(this.dragTarget.x, this.dragTarget.y);
             }
