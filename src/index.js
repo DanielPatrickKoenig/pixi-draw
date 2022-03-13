@@ -68,6 +68,11 @@ window.onload = function() {
   */
 
   const group = new ArtBoardGroup({width: 800, height: 600});
+  group.onChange((boards) => {
+    // console.log(boards);
+    const shapes = boards.map(item => item.shape.vectorize());
+    console.log(shapes);
+  })
   app.stage.addChild(group);
   document.querySelector('#dupe').addEventListener('click', () => {
     group.duplicateArtBoard(group.activeArtBoard);

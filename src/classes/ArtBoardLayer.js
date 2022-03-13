@@ -22,7 +22,7 @@ export default class ArtBoardLayer extends InteractiveContainer{
         this.mode = mode ? mode : ArtBoardModes.PEN;
         this.layerType = LayerTypes.UNSET;
         this.editor = null;
-
+        this.changeHandler = null;
         this.shapeContainer = new Draggable();
         this.shapeContainer.onStart(() => {
             this.editor.visible = false;
@@ -63,7 +63,6 @@ export default class ArtBoardLayer extends InteractiveContainer{
                                 this.shape.clear();
                                 this.shape.beginFill(0xffffff, .001);
                                 this.shape.lineStyle(1, 0x000000, 1);
-                                this.shape.moveTo()
                                 points.forEach((item, index) => {
                                     const coords = item.getAnchorPositions();
                                     if(index === 0){
@@ -79,6 +78,10 @@ export default class ArtBoardLayer extends InteractiveContainer{
                                     
                                 });
                                 this.shape.endFill();
+                            }
+                            if(this.changeHandler){
+                                console.log('art board change');
+                                this.changeHandler({ shape: this.shape, editor: this.editor });
                             }
                             
                         });
@@ -137,6 +140,9 @@ export default class ArtBoardLayer extends InteractiveContainer{
     }
     setTemplate(template){
         this.currentTemplate = template;
+    }
+    onChange(handler){
+        this.changeHandler = handler;
     }
 }
 export {ArtBoardModes, LayerTypes};
