@@ -18,6 +18,7 @@ const LayerTypes = {
 export default class ArtBoardLayer extends InteractiveContainer{
     constructor({width, height, mode}){
         super();
+        this.artBoardID = `art-board-${Math.random().toString().split('.').join('')}-${Math.random().toString().split('.').join('')}-${Math.random().toString().split('.').join('')}`;
         this.currentTemplate = null;
         this.mode = mode ? mode : ArtBoardModes.PEN;
         this.layerType = LayerTypes.UNSET;

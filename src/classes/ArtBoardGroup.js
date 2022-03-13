@@ -23,6 +23,7 @@ export default class ArtBoardGroup extends PIXI.Container{
         board.setMode(ArtBoardModes.TEMPLATE);
         board.setTemplate(template);
         board.addContent({x: 0, y: 0});
+        return board;
     }
     addArtBoard(){
         const board = new ArtBoardLayer({width: this.width, height: this.height});
@@ -37,5 +38,10 @@ export default class ArtBoardGroup extends PIXI.Container{
     }
     onChange(handler){
         this.changeHandler = handler;
+    }
+    setActiveArtBoard(index){
+        if(this.artBoards[index]){
+            this.activeArtBoard = this.artBoards[index];
+        }
     }
 }

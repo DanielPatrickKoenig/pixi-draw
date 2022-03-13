@@ -7,6 +7,7 @@ import PointSet from './classes/PointSet';
 import ArtBoardLayer from './classes/ArtBoardLayer';
 import ShapeTemplate from './classes/ShapeTemplate';
 import ArtBoardGroup from './classes/ArtBoardGroup';
+import Timeline from './classes/Timeline';
 window.onload = function() {
   console.log('loaded');
   const app = new PIXI.Application({
@@ -67,16 +68,18 @@ window.onload = function() {
   app.stage.addChild(artBoardLayer);
   */
 
-  const group = new ArtBoardGroup({width: 800, height: 600});
+  const group = new Timeline({width: 800, height: 600, frameCount: 100});
   group.onChange((boards) => {
     // console.log(boards);
     const shapes = boards.map(item => item.shape.vectorize());
     console.log(shapes);
+    console.log(group);
   })
   app.stage.addChild(group);
   document.querySelector('#dupe').addEventListener('click', () => {
-    group.duplicateArtBoard(group.activeArtBoard);
-  })
+    group.duplicateFrame(0, 1);
+    group.setActiveFrame(1);
+  });
 
 
 
