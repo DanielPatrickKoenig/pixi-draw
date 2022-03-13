@@ -6,6 +6,7 @@ import Draggable from './classes/Draggable';
 import PointSet from './classes/PointSet';
 import ArtBoardLayer from './classes/ArtBoardLayer';
 import ShapeTemplate from './classes/ShapeTemplate';
+import ArtBoardGroup from './classes/ArtBoardGroup';
 window.onload = function() {
   console.log('loaded');
   const app = new PIXI.Application({
@@ -48,6 +49,7 @@ window.onload = function() {
   //   console.log(data);
   // });
 
+  /*
   const artBoardLayer = new ArtBoardLayer({width: 800, height: 600});
   const squareTemplate = new ShapeTemplate();
   squareTemplate.addPoint({x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0});
@@ -63,7 +65,13 @@ window.onload = function() {
 
   artBoardLayer.setTemplate(circleTemplate);
   app.stage.addChild(artBoardLayer);
+  */
 
+  const group = new ArtBoardGroup({width: 800, height: 600});
+  app.stage.addChild(group);
+  document.querySelector('#dupe').addEventListener('click', () => {
+    group.duplicateArtBoard(group.activeArtBoard);
+  })
 
 
 

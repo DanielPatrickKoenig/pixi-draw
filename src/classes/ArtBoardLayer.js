@@ -100,6 +100,7 @@ export default class ArtBoardLayer extends InteractiveContainer{
                 }
             }
         }
+        this.addContent = downMethod;
         this.surfaceContainer.on('mousedown', downMethod);
         this.surfaceContainer.on('touchstart', downMethod);
         // this.on('mousemove', this.move);
@@ -138,3 +139,4 @@ export default class ArtBoardLayer extends InteractiveContainer{
         this.currentTemplate = template;
     }
 }
+export {ArtBoardModes, LayerTypes};
