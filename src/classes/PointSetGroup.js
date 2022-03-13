@@ -1,22 +1,33 @@
 import * as PIXI from 'pixi.js';
 import PointSet from './PointSet';
+import ShapeTemplate from './ShapeTemplate';
 export default class PointSetGroup extends PIXI.Container {
-    constructor(x, y){
+    constructor({ x, y, template }){
         super();
         this.points = [];
-        this.changeHandler = null;
+        this.changeHandler = null
         this.canAdd = true;
         this.closed = false;
-        this.addPoint(x, y);
+        this.isComplete = template;
+        if(!this.isComplete){
+            this.addPoint(x, y);
+        }
+        else{
+            this.createFromTemplate(template, x, y);
+        }
+        
     }
     addPoint(x, y){
+        let set = null;
         if(this.canAdd){
-            const set = new PointSet();
+            set = new PointSet();
             this.points.push(set);
             this.addChild(set);
             set.x = x;
             set.y = y;
-            set.anchors.after.startDrag({x, y});
+            if(!this.isComplete){
+                set.anchors.after.startDrag({x, y});
+            }
             set.onChange(() => {
                 if(this.changeHandler){
                     this.changeHandler(this.points);
@@ -30,8 +41,34 @@ export default class PointSetGroup extends PIXI.Container {
                 }
             });
         }
+        return set;
     }
     onChange(handler){
         this.changeHandler = handler;
+    }
+    createFromTemplate(template, _x, _y){
+        const x = _x ? _x : 0;
+        const y = _y ? _y : 0;
+        template.coords.forEach(item => {
+            const point = this.addPoint(item.x + x, item.y + y);
+            if(item.anchors.before.x !== 0 || item.anchors.before.y !== 0 || item.anchors.after.x !== 0 || item.anchors.after.y !== 0){
+                point.anchors.after.hasMoved = true;
+                point.anchors.after.x = item.anchors.after.x;
+                point.anchors.after.y = item.anchors.after.y;
+                point.anchors.before.x = item.anchors.before.x;
+                point.anchors.before.y = item.anchors.before.y;
+            }
+            
+        });
+        this.points.forEach(item => item.anchors.after.endDrag());
+        this.closed = true;
+        this.canAdd = false;
+    }
+    convertToTemplate(){
+        const template = new ShapeTemplate();
+        this.points.forEach(item => {
+            template.addPoint({x: item.x, y: item.y}, {x: item.anchors.before.x, y: item.anchors.before.y}, {x: item.anchors.after.x, y: item.anchors.after.y})
+        });
+        return template;
     }
 }

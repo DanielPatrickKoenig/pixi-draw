@@ -3,10 +3,12 @@ import InteractiveContainer from './InteractiveContainer';
 import PointSetGroup from './PointSetGroup';
 import VectorableGraphics from './VectorableGraphics';
 import Draggable from './Draggable';
+// import PointSet from './PointSet';
 const ArtBoardModes = {
     MOVE: 0,
     PEN: 1,
-    POLYGON: 2
+    POLYGON: 2,
+    TEMPLATE: 3
 };
 const LayerTypes = {
     UNSET: 0,
@@ -16,9 +18,11 @@ const LayerTypes = {
 export default class ArtBoardLayer extends InteractiveContainer{
     constructor({width, height, mode}){
         super();
+        this.currentTemplate = null;
         this.mode = mode ? mode : ArtBoardModes.PEN;
         this.layerType = LayerTypes.UNSET;
         this.editor = null;
+
         this.shapeContainer = new Draggable();
         this.shapeContainer.onStart(() => {
             this.editor.visible = false;
@@ -45,11 +49,13 @@ export default class ArtBoardLayer extends InteractiveContainer{
                 case ArtBoardModes.MOVE:{
                     break;
                 }
-                case ArtBoardModes.PEN:{
+                case ArtBoardModes.PEN:
+                case ArtBoardModes.TEMPLATE:{
                     console.log('pen');
                     this.layerType = LayerTypes.PEN;
                     if(!this.editor){
-                        this.editor = new PointSetGroup(event.x, event.y);
+                        // this.editor = new PointSetGroup({x: event.x, y: event.y});
+                        this.editor = this.penDown(event.x, event.y, 200, 200);
                         this.shape = new VectorableGraphics();
                         this.shapeContainer.addChild(this.shape);
                         this.editor.onChange((points) => {
@@ -81,6 +87,9 @@ export default class ArtBoardLayer extends InteractiveContainer{
                     else if(!this.editor.closed){
                         this.editor.addPoint(event.x, event.y);
                     }
+                    if(this.mode !== ArtBoardModes.PEN){
+                        this.editor.changeHandler(this.editor.points);
+                    }
                     break;
                 }
                 case ArtBoardModes.POLYGON:{
@@ -110,5 +119,22 @@ export default class ArtBoardLayer extends InteractiveContainer{
             item.y += y;
         });
         this.editor.changeHandler(this.editor.points);
+    }
+    penDown(x, y){
+        let group = null;
+        switch(this.mode){
+            case ArtBoardModes.PEN:{
+                group = new PointSetGroup({ x, y });
+                break;
+            }
+            case ArtBoardModes.TEMPLATE:{
+                group = new PointSetGroup({ x, y, template: this.currentTemplate });
+            }
+        }
+        return group;
+        
+    }
+    setTemplate(template){
+        this.currentTemplate = template;
     }
 }

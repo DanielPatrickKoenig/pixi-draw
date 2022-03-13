@@ -5,6 +5,7 @@ import RegularPolygon from './classes/RegularPolygon';
 import Draggable from './classes/Draggable';
 import PointSet from './classes/PointSet';
 import ArtBoardLayer from './classes/ArtBoardLayer';
+import ShapeTemplate from './classes/ShapeTemplate';
 window.onload = function() {
   console.log('loaded');
   const app = new PIXI.Application({
@@ -48,6 +49,19 @@ window.onload = function() {
   // });
 
   const artBoardLayer = new ArtBoardLayer({width: 800, height: 600});
+  const squareTemplate = new ShapeTemplate();
+  squareTemplate.addPoint({x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0});
+  squareTemplate.addPoint({x: 100, y: 0}, {x: 0, y: 0}, {x: 0, y: 0});
+  squareTemplate.addPoint({x: 100, y: 150}, {x: 0, y: 0}, {x: 0, y: 0});
+  squareTemplate.addPoint({x: 0, y: 150}, {x: 0, y: 0}, {x: 0, y: 0});
+
+  const circleTemplate = new ShapeTemplate();
+  circleTemplate.addPoint({x: 50, y: 0}, {x: -25, y: 0}, {x: 25, y: 0});
+  circleTemplate.addPoint({x: 100, y: 50}, {x: 0, y: -25}, {x: 0, y: 25});
+  circleTemplate.addPoint({x: 50, y: 100}, {x: 25, y: 0}, {x: -25, y: 0});
+  circleTemplate.addPoint({x: 0, y: 50}, {x: 0, y: 25}, {x: 0, y: -25});
+
+  artBoardLayer.setTemplate(circleTemplate);
   app.stage.addChild(artBoardLayer);
 
 
