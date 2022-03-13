@@ -10,6 +10,10 @@ export default class PointSet extends PIXI.Container{
         this.mirrorAngle = true;
         this.changeHandler = null;
         this.selectedHandler = null;
+        this.forceAnchorVisibility = {
+            before: false,
+            after: false
+        };
         const anchorSize = 10;
         const pointSize = anchorSize * 2;
         this.twinProperties = {
@@ -34,6 +38,11 @@ export default class PointSet extends PIXI.Container{
             }
         });
         this.point.onMove(() => {
+            if(this.changeHandler){
+                this.changeHandler(this.getAnchorPositions());
+            }
+        });
+        this.point.onEnd(() => {
             if(this.changeHandler){
                 this.changeHandler(this.getAnchorPositions());
             }
@@ -72,13 +81,16 @@ export default class PointSet extends PIXI.Container{
                 const eitherMoved = this.anchors.before.hasMoved || this.anchors.after.hasMoved;
                 const beforeMoved = this.firstMove ? eitherMoved : this.anchors.before.hasMoved;
                 const afterMoved = this.firstMove ? eitherMoved : this.anchors.after.hasMoved;
-                this.anchors.before.visible = beforeMoved;
-                this.anchors.after.visible = afterMoved;
+                this.anchors.before.visible = beforeMoved || this.forceAnchorVisibility.before;
+                this.anchors.after.visible = afterMoved || this.forceAnchorVisibility.after;
                 this.anchors.before.hasMoved = beforeMoved;
                 this.anchors.after.hasMoved = afterMoved;
                 console.log(this.anchors.before.visible);
                 this.firstMove = false;
                 this.mirrorDistance = false;
+                if(this.changeHandler){
+                    this.changeHandler(this.getAnchorPositions());
+                }
             });
         });
         
